@@ -1,0 +1,6 @@
+https://www.youtube.com/watch?v=OV1z7srUYBM - быстрый разбор вычисления точки лагранжа для системы Земля-Солнце
+https://www.sciencedirect.com/topics/physics-and-astronomy/lagrangian-points - страница со ссылками на разнообразные англоязычные работы по теме
+http://www.spaceacademy.net.au/library/notes/lagrangp.htm - статья австралийского университета по лагранжевым точкам
+https://demonstrations.wolfram.com/LagrangePoints/ - ссылка на демонстрацию лагранжевых точек в Wolfram Mathematica(2х и 3х мерные, с регуляцией соотношения масс и расстояния между точками)
+https://demonstrations.wolfram.com/RestrictedThreeBodyProblem/ - ссылка на демонстрацию ограниченной задачи трех тел в Wolfram Mathematica
+
