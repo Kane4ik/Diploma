@@ -5,3 +5,7 @@ https://demonstrations.wolfram.com/LagrangePoints/ - ссылка на демо�
 https://demonstrations.wolfram.com/RestrictedThreeBodyProblem/ - ссылка на демонстрацию ограниченной задачи трех тел в Wolfram Mathematica
 http://www.jgiesen.de/lagrange/index.html - тут делали апплет по лагранжевым точкам. очень много ссылок на ресурсы
 
+https://metanit.com/sharp/tutorial/
+https://metanit.com/sharp/wpf/1.2.php
+http://scienceworld.wolfram.com/physics/LagrangePoints.html
+
