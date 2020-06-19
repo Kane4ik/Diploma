@@ -25,14 +25,13 @@ namespace Diploma
         double omega = 0;
         double initialCoordX;
         double initialCoordY;
-        double directionCoordX = 0;
-        double directionCoordY = 0;
-        bool plotClicked = true;
         double centrMass = 0;
         double accelX = 0; double accelY = 0;
         double[] particlePathX = new double[100];
         double[] particlePathY = new double[100];
         int arrayCounter = 0;
+        double firstMassX = 0;
+        double secondMassX = 0;
         public Form1()
         {
             InitializeComponent();
@@ -54,8 +53,12 @@ namespace Diploma
             speed0Y = Convert.ToDouble(textBox5.Text);
             distanceBetweenMasses = Convert.ToDouble(textBox3.Text);
             alpha = secondMass / (firstMass + secondMass);
-            omega = gravConst * (firstMass + secondMass) / Math.Pow(distanceBetweenMasses, 2);
             centrMass = (firstMass + secondMass * distanceBetweenMasses) / (firstMass + secondMass);
+
+            firstMassX = -secondMass / (firstMass + secondMass) * distanceBetweenMasses;
+            secondMassX = firstMass / (firstMass + secondMass) * distanceBetweenMasses;
+            omega = Math.Sqrt(gravConst * (firstMass / (Math.Pow(firstMassX - centrMass, 2) + Math.Pow(initialCoordX, 2))) + secondMass / (Math.Pow(secondMassX - centrMass - initialCoordX, 2) + Math.Pow(initialCoordY, 2)));
+
 
             double L1 = distanceBetweenMasses * (1 - Math.Pow(alpha / 3.0, 1.0 / 3)); //сделать отдельной функцией, вынести в другой класс
             double L2 = distanceBetweenMasses * (1 + Math.Pow(alpha / 3.0, 1.0 / 3)); //сделать отдельной функцией, вынести в другой класс
@@ -73,15 +76,10 @@ namespace Diploma
             double[] dataYFirstMass = new double[] { 0 };
             double[] dataXSecondMass = new double[] { firstMass / (firstMass + secondMass) * distanceBetweenMasses };
 
-            initialCoordX = (firstMass + secondMass * distanceBetweenMasses) / (firstMass + secondMass) - 75;
-            initialCoordY = -32;
-
-            formsPlot1.plt.PlotScatter(dataXFirstMass, dataYFirstMass, markerSize: 10, markerShape: MarkerShape.filledCircle);
-            formsPlot1.plt.PlotScatter(dataXSecondMass, dataYFirstMass, markerSize: 10 * (secondMass / firstMass), markerShape: MarkerShape.filledCircle);
+            formsPlot1.plt.PlotScatter(dataXFirstMass, dataYFirstMass, markerSize: 20, markerShape: MarkerShape.filledCircle);
+            formsPlot1.plt.PlotScatter(dataXSecondMass, dataYFirstMass, markerSize: 20 * (secondMass / firstMass), markerShape: MarkerShape.filledCircle);
             formsPlot1.plt.PlotScatter(dataX, dataY, lineWidth: 0);
             formsPlot1.Render();
-
-            plotClicked = false;
         }
 
 
@@ -89,13 +87,27 @@ namespace Diploma
         {
             if (arrayCounter < particlePathX.Length)
             {
-                particlePathX[arrayCounter] = speed0X;
-                particlePathY[arrayCounter] = speed0Y;
+                particlePathX[arrayCounter] = initialCoordX + speed0X;
+                particlePathY[arrayCounter] = initialCoordY + speed0Y;
 
-                accelX = Math.Round(-gravConst * firstMass * initialCoordX / Math.Pow((Math.Pow(initialCoordX, 2) + Math.Pow((-secondMass / (firstMass + secondMass) * distanceBetweenMasses), 2)), 3.0 / 2.0) - gravConst * secondMass * initialCoordX / Math.Pow((Math.Pow(initialCoordX, 2) + Math.Pow(firstMass / (firstMass + secondMass) * distanceBetweenMasses, 2)), 3.0 / 2.0) + Math.Pow(omega, 2) * initialCoordX + 2 * omega * speed0Y, 15);
-                accelY = Math.Round(-gravConst * firstMass * ((-secondMass / (firstMass + secondMass) * distanceBetweenMasses) - initialCoordY) / Math.Pow(Math.Pow(-secondMass / (firstMass + secondMass) * distanceBetweenMasses - initialCoordY, 2), 3.0 / 2.0) + gravConst * secondMass * (firstMass / (firstMass + secondMass) * distanceBetweenMasses - initialCoordY) / Math.Pow(Math.Pow(firstMass / (firstMass + secondMass) * distanceBetweenMasses - initialCoordY, 2), 3.0 / 2.0) + Math.Pow(omega, 2) * initialCoordY + 2 * omega * speed0X, 15);
-                speed0X = initialCoordX + accelX;
-                speed0Y = initialCoordY + accelY;
+                double omega2 = Math.Sqrt(gravConst * (firstMass / (Math.Pow(firstMassX - centrMass, 2) + Math.Pow(initialCoordX, 2))) + secondMass / (Math.Pow(secondMassX - centrMass - initialCoordX, 2) + Math.Pow(initialCoordY, 2)));
+
+
+                double F1x = -gravConst * firstMass * initialCoordX / Math.Pow(firstMassX + (initialCoordX - centrMass), 3);
+                double F2x = -gravConst * secondMass * initialCoordX / Math.Pow((firstMassX - centrMass) - initialCoordX, 3);
+                double Fyx = Math.Pow(omega2, 2) * initialCoordX;
+                double Fkorx = -2 * omega2 * speed0Y;
+
+                double F1y = -gravConst * firstMass * initialCoordX / Math.Pow(initialCoordY, 3.0);
+                double F2y = -gravConst * secondMass * initialCoordX / Math.Pow(initialCoordY, 3.0);
+                double Fyy = Math.Pow(omega2, 2) * initialCoordY;
+                double Fkory = 2 * omega2 * speed0X;
+
+                accelX = F1x + F2x + Fyx + Fkorx;
+                accelY = F1y + F2y + Fyy + Fkory;
+                speed0X = speed0X + accelX;
+                speed0Y = speed0Y + accelY;
+                listBox1.Items.Add("Координата X" + arrayCounter + ": = " + initialCoordX + ". Координата Y" + arrayCounter + ": = " + initialCoordY);
                 initialCoordX = particlePathX[arrayCounter];
                 initialCoordY = particlePathY[arrayCounter];
             }
@@ -108,23 +120,26 @@ namespace Diploma
         private void button2_Click(object sender, EventArgs e)
         {
             timer1.Start();
+            Array.Clear(particlePathX, 0, 100);
+            Array.Clear(particlePathY, 0, 100);
         }
 
-        /*private void formsPlot1_MouseClicked(object sender, MouseEventArgs e)
+        private void trackBar1_Scroll(object sender, EventArgs e)
         {
-            if (plotClicked == false)
-            {
-                initialCoordX = Cursor.Position.X;
-                initialCoordY = Cursor.Position.Y;
-                
-                double[] dataXClick = new double[] { Cursor.Position.X };
-                double[] dataYClick = new double[] { Cursor.Position.Y };
-                formsPlot1.plt.PlotScatter(dataXClick, dataYClick, markerSize: 15, markerShape: MarkerShape.filledCircle);
-                formsPlot1.Render();
-            }
-            plotClicked = true;
-            
+            if (trackBar1.Value > 500) initialCoordX = trackBar1.Value - 500;
+            else if (trackBar1.Value < 500) initialCoordX = trackBar1.Value - 500;
+            double[] dataX1 = new double[] { initialCoordX };
+            double[] dataY1 = new double[] { initialCoordY };
+
         }
-        */
+
+        private void trackBar2_Scroll(object sender, EventArgs e)
+        {
+            if (trackBar2.Value > 500) initialCoordY = trackBar2.Value - 500;
+            else if (trackBar2.Value < 500) initialCoordY = trackBar2.Value - 500;
+            double[] dataX2 = new double[] { initialCoordX };
+            double[] dataY2 = new double[] { initialCoordY };
+
+        }
     }
 }
